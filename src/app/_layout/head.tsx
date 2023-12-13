@@ -1,9 +1,6 @@
 import { Flex } from "@chakra-ui/layout";
+import { Container, Textarea } from "@chakra-ui/react";
 
 export default function Head() {
-  return (
-    <Flex flexDirection={"row"}>
-      <h3>nextjs-chat</h3>
-    </Flex>
-  );
+  return <Flex flexDirection={"row"}>nextjs-chat</Flex>;
 }
