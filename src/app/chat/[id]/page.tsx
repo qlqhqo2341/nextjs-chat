@@ -2,24 +2,30 @@
 
 import {
   Button,
+  Container,
   Input,
   InputGroup,
   InputRightElement,
   Stack,
   Text,
+  VStack,
 } from "@chakra-ui/react";
 import {
   ChangeEventHandler,
   FormEventHandler,
   useEffect,
   useReducer,
+  useRef,
   useState,
 } from "react";
 import io from "socket.io-client";
 
-function textAddReducer(state: { text: string }, action: { text: string }) {
-  if (action?.text) {
-    return { text: `${state.text}\n${action.text}` };
+function textAddReducer(
+  state: { textList: string[] },
+  action: { textList: string[] },
+) {
+  if (action?.textList) {
+    return { textList: state.textList.concat(...action.textList) };
   }
   return state;
 }
@@ -30,28 +36,37 @@ export default function ChatRoom({
   params: { id: string };
 }) {
   const [chatRoomData, chatRoomDispath] = useReducer(textAddReducer, {
-    text: "",
+    textList: [] as string[],
   });
 
   const [chatInput, setChatInput] = useState<string>();
   const [socketClient, setSocketClient] = useState<any>();
+  const scrollContainer = useRef<HTMLDivElement>(null);
 
   const roomString = `${id}_room`;
 
   useEffect(() => {
-    chatRoomDispath({ text: roomString });
-
     const _socketClient = io(window.location.origin);
 
     _socketClient.on("connect", () => {
       console.log("connection server");
+      chatRoomDispath({ textList: [roomString] });
     });
     _socketClient.on(roomString, (msg) => {
-      chatRoomDispath({ text: msg });
+      chatRoomDispath({ textList: [msg] });
+      const currentScrollContainer = scrollContainer.current;
+      if (currentScrollContainer) {
+        currentScrollContainer.scrollTop = currentScrollContainer.scrollHeight;
+      }
     });
     _socketClient.emit("listen_room", id);
 
     setSocketClient(_socketClient);
+    return () => {
+      if (_socketClient) {
+        _socketClient.close();
+      }
+    };
   }, []);
 
   const onChangeInput: ChangeEventHandler<HTMLInputElement> = (evt) => {
@@ -66,8 +81,12 @@ export default function ChatRoom({
   };
   return (
     <Stack spacing={4}>
-      <Text>{chatRoomData.text}</Text>
-      <form onSubmit={onSubmit}>
+      <VStack align={"start"} overflow={"auto"} ref={scrollContainer}>
+        {chatRoomData?.textList?.map?.((text, i) => (
+          <Text key={i}>{text}</Text>
+        ))}
+      </VStack>
+      <form onSubmit={onSubmit} style={{ height: "5rem" }}>
         <InputGroup>
           <Input
             placeholder="여기에 채팅을 입력하세요."

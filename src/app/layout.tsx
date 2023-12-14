@@ -26,10 +26,10 @@ export default function RootLayout({
           <Grid
             templateAreas={`"header header"
                   "nav main"`}
-            gridTemplateRows={"50px 1fr 30px"}
-            gridTemplateColumns={"150px 1fr"}
-            h="200px"
+            gridTemplateRows={"3rem 1fr"}
+            gridTemplateColumns={"10rem 1fr"}
             gap="1"
+            height={"100vh"}
             color="blackAlpha.700"
             fontWeight="bold"
           >
