@@ -6,6 +6,7 @@ export default function Navigation() {
     <Flex flexDirection={"column"}>
       <Link href="/">home</Link>
       <Link href="/chat">chat list</Link>
+      <Link href="/chat/create">create chat</Link>
     </Flex>
   );
 }
